@@ -36,7 +36,10 @@ const Users = () => {
   return (
     <>
       <Switch>
-        <Route path={path + '/profile'} component={UserPage} />
+        <Route
+          path={path + '/profile'}
+          render={(props) => <UserPage {...props} userId={userId} />}
+        />
         <Route path={path + '/edit'} component={UserEditPage} />
         <Route
           exact
