@@ -8,6 +8,43 @@ import {
   useRouteMatch,
 } from 'react-router-dom';
 
+const AppLayout = () => {
+  return (
+    <>
+      <h1>App Layout</h1>
+      <HomePage />
+    </>
+  );
+};
+
+const UsersLayout = () => {
+  let { path, url } = useRouteMatch();
+  const { userId } = useParams();
+
+  if (url === `/users/${userId}/`) {
+    return <Redirect to={`/users/${userId}/profile`} />;
+  }
+
+  return (
+    <Switch>
+      <Route path={path + '/:userId'} component={UserLayot} />
+      <Route path={path} component={UsersListPage} />
+    </Switch>
+  );
+};
+
+const UserLayot = () => {
+  let { path } = useRouteMatch();
+
+  return (
+    <Switch>
+      <Route path={path + '/profile'} component={UserPage} />
+      <Route path={path + '/edit'} component={UserEditPage} />
+      <Route exact path={path} component={UserPage} />
+    </Switch>
+  );
+};
+
 const HomePage = () => {
   return (
     <>
@@ -17,42 +54,15 @@ const HomePage = () => {
   );
 };
 
-const users = [
-  { id: 1, name: 'user 0' },
-  { id: 2, name: 'user 1' },
-  { id: 3, name: 'user 2' },
-  { id: 4, name: 'user 3' },
-  { id: 5, name: 'user 4' },
-];
+const UsersListPage = () => {
+  const users = [
+    { id: 1, name: 'user 0' },
+    { id: 2, name: 'user 1' },
+    { id: 3, name: 'user 2' },
+    { id: 4, name: 'user 3' },
+    { id: 5, name: 'user 4' },
+  ];
 
-const Users = () => {
-  const { userId } = useParams();
-  let { path, url } = useRouteMatch();
-
-  if (url === `/users/${userId}/`) {
-    return <Redirect to={`/users/${userId}/profile`} />;
-  }
-
-  return (
-    <>
-      <Switch>
-        <Route
-          path={path + '/profile'}
-          render={(props) => <UserPage {...props} userId={userId} />}
-        />
-        <Route path={path + '/edit'} component={UserEditPage} />
-        <Route
-          exact
-          path={path}
-          render={(...props) => <UserPage {...props} userId={userId} />}
-        />
-        <Redirect to={path + '/profile'} />
-      </Switch>
-    </>
-  );
-};
-
-const UsersListPage = ({ users }) => {
   let { url } = useRouteMatch();
 
   if (url === '/users/') {
@@ -75,7 +85,9 @@ const UsersListPage = ({ users }) => {
   );
 };
 
-const UserPage = ({ userId }) => {
+const UserPage = () => {
+  const { userId } = useParams();
+
   return (
     <>
       <h1>User page</h1>
@@ -100,7 +112,7 @@ const UserEditPage = () => {
       <h1>Edit user page</h1>
       <ul>
         <li>
-          <Link to="/users/:userId/profile">User profile page</Link>
+          <Link to={`/users/${userId}/profile`}>User profile page</Link>
         </li>
         <li>
           <Link to={`/users/${+userId + 1}`}>Another user</Link>
@@ -115,19 +127,13 @@ const UserEditPage = () => {
 
 function App() {
   return (
-    <div>
-      <h1>App</h1>
+    <>
       <Switch>
-        <Route path="/" exact component={HomePage} />
-        <Route
-          exact
-          path="/users"
-          render={(props) => <UsersListPage {...props} users={users} />}
-        />
-        <Route path="/users/:userId?" component={Users} />
+        <Route path="/" exact component={AppLayout} />
+        <Route path="/users/:userId?" component={UsersLayout} />
         <Redirect from="*" to="/" />
       </Switch>
-    </div>
+    </>
   );
 }
 
